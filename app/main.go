@@ -18,6 +18,13 @@ func main() {
 			log.Fatal(err)
 		}
 		command = strings.TrimSpace(command)
-		fmt.Printf("%s: command not found\n", command)
+
+		if command == "exit" {
+			break
+		} else if strings.HasPrefix(command, "echo") {
+			fmt.Printf("%s\n", command[5:])
+		} else {
+			fmt.Printf("%s: command not found\n", command)
+		}
 	}
 }
