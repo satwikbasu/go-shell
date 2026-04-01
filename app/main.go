@@ -82,7 +82,8 @@ func run_builtin(commandList []string) {
 					}
 				}
 				if !execFound {
-					fmt.Printf("%s: not found\n", argAfterType)
+					// fmt.Printf("%s: not found\n", argAfterType)
+					print_invalid(argAfterType)
 				}
 			}
 		}
