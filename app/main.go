@@ -11,23 +11,26 @@ import (
 
 var builtIn []string = []string{"echo", "exit", "type"} // slice to check for built-in shell commands
 
+// converts the raw terminal input into a slice
 func command_to_list (inputString string) []string {
 	command := strings.TrimSpace(inputString) // remove trailing whitespaces
 	parts := strings.Fields(command) // stores all words in the command separately
 	return parts
 }
 
+// prints output for invalid command
 func print_invalid(command string) {
 	fmt.Printf("%s: not found\n", command)
 }
 
-// to check if the command is builtin and has enough arguments
+// checks if the command is builtin and has enough arguments
 func check_for_builtin(commandList []string) {
-	if slices.Contains(builtIn, commandList[0]) && len(commandList) > 1 {
+	isBuiltin := slices.Contains(builtIn, commandList[0])
+	if isBuiltin && len(commandList) > 1 {
 		run_builtin(commandList)
 	} else {
-		// check if there are no arguments at all
-		if len(commandList) == 1 {
+		// checks if there are no arguments at all
+		if isBuiltin && len(commandList) == 1 {
 			fmt.Printf("%s: too few arguments\n", commandList[0])
 		} else {
 			fmt.Printf("%s: not found\n", commandList[0])
@@ -35,6 +38,8 @@ func check_for_builtin(commandList []string) {
 	}
 }
 
+// runs built in command
+// TODO: refactor with switch case or better alternatives
 func run_builtin(commandList []string) {
 
 	// echo command parse and eval
