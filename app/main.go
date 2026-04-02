@@ -42,55 +42,50 @@ func check_for_builtin(commandList []string) {
 // TODO: refactor with switch case or better alternatives
 func run_builtin(commandList []string) {
 
+	prefixCommand := commandList[0]
+
+	switch prefixCommand {
+
 	// echo command parse and eval
-	if commandList[0] == "echo" {
+	case "echo":
 		echoPrint := strings.Join(commandList[1:], " ")
 		fmt.Printf("%s\n", echoPrint)
-	} else if commandList[0] == "type" {
-
-		// type command parse and eval
-		if len(commandList) > 1 {
-			argAfterType := commandList[1] // fetching second word after type
-
-			// check if type is followed by built-in shell command
-			if slices.Contains(builtIn, argAfterType) {
+	
+	case "type":
+		argAfterType := commandList[1] // fetching second word after type
+		if slices.Contains(builtIn, argAfterType) {
 				fmt.Printf("%s is a shell builtin\n", argAfterType)
-			} else {
-				pathValue := os.Getenv("PATH") // stores $PATH as a string
-				directories := strings.Split(pathValue, string(os.PathListSeparator)) // splits $PATH directories into a slice
-				// fmt.Printf("%#v\n", directories)
-				// fmt.Printf("%T\n", pathValue)
+		} else {
+			pathValue := os.Getenv("PATH") // stores $PATH as a string
+			directories := strings.Split(pathValue, string(os.PathListSeparator)) // splits $PATH directories into a slice
+			// fmt.Printf("%#v\n", directories)
+			// fmt.Printf("%T\n", pathValue)
 
-				var execFound bool // to check if executable was found with right permissions
+			var execFound bool // to check if executable was found with right permissions
 
-				for _, dir := range directories {
-					fullPath := dir + "/" + argAfterType
-					fileInfo, err := os.Stat(fullPath)
-					// fmt.Printf("%#v\n", fullPath)
-					if err == nil {
-						mode := fileInfo.Mode()
-						// fmt.Printf("%#v\n", mode)
-						// Check if the found file is not a directory and has any execute permissions set (owner, group, or others)
-						// mode.IsDir() returns true if the file is a directory, so !mode.IsDir() ensures it's a file
-						// mode.Perm()&0111 checks if any of the execute bits are set (octal 0111 = execute for owner, group, or others)
-						if !mode.IsDir() && (mode.Perm()&0111 != 0) {
-							// Found an executable file in the directory
-							fmt.Printf("%s is %s\n", argAfterType, fullPath)
-							execFound = true
-							break
-						}
+			for _, dir := range directories {
+				fullPath := dir + "/" + argAfterType
+				fileInfo, err := os.Stat(fullPath)
+				// fmt.Printf("%#v\n", fullPath)
+				if err == nil {
+					mode := fileInfo.Mode()
+					// fmt.Printf("%#v\n", mode)
+					// Check if the found file is not a directory and has any execute permissions set (owner, group, or others)
+					// mode.IsDir() returns true if the file is a directory, so !mode.IsDir() ensures it's a file
+					// mode.Perm()&0111 checks if any of the execute bits are set (octal 0111 = execute for owner, group, or others)
+					if !mode.IsDir() && (mode.Perm()&0111 != 0) {
+						// Found an executable file in the directory
+						fmt.Printf("%s is %s\n", argAfterType, fullPath)
+						execFound = true
+						break
 					}
 				}
-				if !execFound {
-					// fmt.Printf("%s: not found\n", argAfterType)
-					print_invalid(argAfterType)
-				}
+			}
+			if !execFound {
+				// fmt.Printf("%s: not found\n", argAfterType)
+				print_invalid(argAfterType)
 			}
 		}
-	
-	// invalid command handling
-	} else {
-		print_invalid(commandList[0])
 	}
 }
 
